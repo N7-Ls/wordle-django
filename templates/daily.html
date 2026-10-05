@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}每日挑戰{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">每日 Wordle 挑戰</h3>
+                </div>
+                <div class="panel-body">
+                    {% if messages %}
+                        {% for msg in messages %}
+                            <div class="alert alert-{{ msg.tags }}">
+                                {{ msg }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if history.is_solved %}
+                        <div class="alert alert-success">
+                            你已成功完成今天的挑戰！總共嘗試了 {{ history.total_attempts }} 次。
+                        </div>
+                        <button class="btn btn-success" onclick="generateEmoji()">📋 顯示分享結果</button>
+                    {% elif history.total_attempts >= 6 %}
+                        <div class="alert alert-warning">
+                            你已用完今天的 6 次機會，答案是：<strong>{{ history.answer }}</strong>
+                        </div>
+                        <button class="btn btn-warning" onclick="generateEmoji()">📋 顯示分享結果</button>
+                    {% endif %}
+                    <div id="shareText" class="well" style="white-space: pre-wrap; display: none; margin-top: 10px;"></div>
+
+                    {% if history.total_attempts < 6 and not history.is_solved %}
+                        <form method="POST" class="form-inline">
+                            {% csrf_token %}
+                            {{ guess_form.guess_word.label_tag }} {{ guess_form.guess_word }}
+                            <button type="submit" class="btn btn-primary">送出猜測</button>
+                        </form>
+                        <hr>
+                    {% endif %}
+
+                    <h4>你的猜測紀錄：</h4>
+                    {% if guesses %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>猜測單字</th>
+                                    <th>結果</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for g in guesses %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ g.guess_word|upper }}</td>
+                                    <td>
+                                        {% for c in g.result %}
+                                            {% if c == 'G' %}
+                                                <span class="label label-success">G</span>
+                                            {% elif c == 'Y' %}
+                                                <span class="label label-warning">Y</span>
+                                            {% else %}
+                                                <span class="label label-default">X</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>你還沒有進行任何猜測。</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function generateEmoji() {
+    const emojiMap = {
+        'G': '🟩',
+        'Y': '🟨',
+        'X': '⬛'
+    };
+
+    const resultLines = [
+        {% for g in guesses %}
+            "{{ g.result }}",
+        {% endfor %}
+    ];
+
+    let emojiText = '';
+    for (let res of resultLines) {
+        let line = '';
+        for (let i = 0; i < res.length; i++) {
+            line += emojiMap[res[i]];
+        }
+        emojiText += line + '\n';
+    }
+
+    const today = new Date();
+    const dateString = today.getFullYear().toString().slice(-2) + '-' +
+                       String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                       String(today.getDate()).padStart(2, '0');
+
+    const header = `Wordle ${dateString} {{ history.total_attempts }}/6\n\n`;
+    document.getElementById("shareText").textContent = header + emojiText.trim();
+    document.getElementById("shareText").style.display = 'block';
+}
+
+</script>
+{% endblock %}

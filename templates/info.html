@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}個人紀錄{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="mt-4">個人遊戲紀錄 - {{ username }}</h2>
+    <hr>
+
+    <div class="row mb-4">
+        <div class="col-sm-4">
+            <div class="panel panel-warning">
+                <div class="panel-heading"><strong>總遊玩次數</strong></div>
+                <div class="panel-body">
+                    {{ total_games }}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="panel panel-info">
+                <div class="panel-heading"><strong>成功次數</strong></div>
+                <div class="panel-body">
+                    {{ solved_games }}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="panel panel-success">
+                <div class="panel-heading"><strong>平均嘗試次數</strong></div>
+                <div class="panel-body">
+                    {{ avg_attempts | floatformat:2 }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>歷史紀錄</h3>
+    {% if history %}
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>日期</th>
+                <th>是否完成</th>
+                <th>嘗試次數</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in history %}
+            <tr>
+                <td>{{ h.date }}</td>
+                <td>{{ h.is_solved | yesno:"✔,✘" }}</td>
+                <td>{{ h.total_attempts }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>你還沒有任何遊戲紀錄。</p>
+    {% endif %}
+</div>
+{% endblock %}

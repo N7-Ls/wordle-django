@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}首頁{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-md-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h2>今日排行榜</h2>
+                </div>
+                <div class="panel-body">
+                    {% if leaderboard %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>玩家名稱</th>
+                                <th>嘗試次數</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in leaderboard %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ record.user.username }}</td>
+                                    <td>{{ record.total_attempts }}</td>
+                                </tr>
+                            {% endfor %}
+                            {% else %}
+                                <p>目前尚無完成今日挑戰的玩家。</p>
+                        
+                    {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2>網站介紹</h2>
+                </div>
+                <div class="panel-body">
+                    <div style="white-space: pre-wrap;">
+                        歡迎來到正版 Wordle 網站！這是一個"絕對原創"的 Wordle 遊戲平台，我們提供以下特色功能：
+
+                        - 每日挑戰：每天自動更新一個五字英文單字，最多可嘗試 6 次。
+
+                        - 字典驗證：所有猜測皆會自動驗證是否為合法英文單字，確保遊戲公平性。
+
+                        - 即時排行榜：每日更新完成挑戰玩家的排行榜，展示每位玩家完成所花的次數。
+
+                        - 個人紀錄與統計：登入後可查看自己每日的挑戰紀錄、總場次、成功次數與平均嘗試次數。
+
+                        - Emoji 分享：完成挑戰後，可複製專屬 Emoji 格式的結果，輕鬆分享給朋友！
+                    </div>
+                    <img src="{% static 'images/wordle.jpg' %}" width="150" align="right"> 
+                </div>
+            </div>    
+        </div>
+    </div>
+</div>
+{% endblock %}
